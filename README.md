@@ -404,26 +404,300 @@ Explorando este proyecto puedes entender:
 
 ---
 
-# Instalación
+# Mini Guía — FingerprintTelemetry
+---
 
-## Instalar dependencias
-
-```bash id="g0s31p"
+# 1. Instalar dependencias
+```bash
 pip install requirements.txt
 ```
 
-## Ejecutar el servidor
+(Opcionalmente) puedes usar entorno virtual:
 
-```bash id="pw8e2q"
-python3 uvicorn FingerprintTelemetry:app --reload
+```bash
+python -m venv venv
 ```
 
-## Abrir la interfaz
+Linux/macOS:
 
-```bash id="ik2t9m"
+```bash
+source venv/bin/activate
+```
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+---
+
+# 2. Guardar el archivo
+
+Por ejemplo:
+
+```bash
+FingerprintTelemetry.py
+```
+
+---
+
+# 3. Ejecutar la aplicación
+
+```bash
+python3 uvicorn FingerprintTelemetry:app --reload 
+```
+---
+
+# 4. Verificar que el backend funciona
+
+Abrir:
+
+```text
+http://127.0.0.1:8000/health
+```
+
+Respuesta esperada:
+
+```json
+{
+  "status":"ok",
+  "time":123456,
+  "sessions":0
+}
+```
+
+---
+
+# 5. Crear una sesión nueva
+
+Abrir:
+
+```text
 http://127.0.0.1:8000/new
 ```
 
+Esto:
+
+* genera un token
+* crea una sesión
+* muestra el endpoint conductual
+
+Ejemplo:
+
+```text
+http://127.0.0.1:8000/a1b2c3d4e5f6
+```
+
+---
+
+# 6. Abrir la sesión
+
+Cuando abras el endpoint generado:
+
+```text
+http://127.0.0.1:8000/<token>
+```
+
+el navegador:
+
+* carga `/s.js`
+* inicia telemetría
+* recolecta timing
+* mide interacción
+* analiza rendering
+* mide jitter
+* observa focus/visibility
+* manda señales a `/collect`
+
+---
+
+# 7. Ver el dashboard
+
+Abrir:
+
+```text
+http://127.0.0.1:8000/dashboard
+```
+
+Aquí verás:
+
+* sesiones activas
+* coherence score
+* anomaly score
+* RTT
+* interpretación ambiental
+* clasificación conductual
+
+---
+
+# Flujo visual rápido
+
+```text
+/new
+  ↓
+Genera token
+  ↓
+/<token>
+  ↓
+Carga s.js
+  ↓
+Recolecta señales
+  ↓
+POST /collect
+  ↓
+Procesamiento backend
+  ↓
+/dashboard
+```
+
+---
+
+# Rutas principales
+
+| Ruta         | Función                  |
+| ------------ | ------------------------ |
+| `/health`    | Estado del backend       |
+| `/ping`      | RTT + timing test        |
+| `/s.js`      | Telemetría cliente       |
+| `/new`       | Crear sesión             |
+| `/dashboard` | Panel principal          |
+| `/collect`   | Recepción de señales     |
+| `/{token}`   | Página de sincronización |
+
+---
+
+# Qué hace realmente `/s.js`
+
+La telemetría cliente:
+
+* obtiene información ambiental
+* mide variabilidad temporal
+* registra interacción humana
+* analiza frame timing
+* calcula jitter
+* mide RTT
+* detecta cambios de foco
+* analiza comportamiento del render loop
+
+---
+
+# Qué calcula el backend
+
+El backend intenta interpretar:
+
+## Entropía temporal
+
+```python
+statistics.stdev(arr)
+```
+
+Mientras más variación:
+
+* más “orgánico” puede parecer el entorno
+
+Mientras más uniforme:
+
+* más “sintético” puede parecer
+
+---
+
+# Clasificaciones posibles
+
+## organic
+
+Ruido natural y fluctuación normal.
+
+## synthetic
+
+Variabilidad demasiado uniforme.
+
+## unstable
+
+Mucha fluctuación o presión runtime.
+
+## volatile
+
+Drift fuerte entre perfiles.
+
+---
+
+# Mini escenario de prueba
+
+## Caso 1 — Navegador normal
+
+Abrir:
+
+* Chrome normal
+* mover mouse
+* cambiar pestañas
+* hacer scroll
+
+Resultado esperado:
+
+* `organic`
+* mayor variabilidad
+* interacción detectada
+
+---
+
+## Caso 2 — Entorno automatizado simple
+
+Abrir con:
+
+* navegador headless básico
+* interacción mínima
+
+Resultado esperado:
+
+* menor ruido
+* menor interacción
+* posible `synthetic`
+
+---
+
+# Qué NO hace el sistema
+
+Actualmente NO:
+
+* detecta bots avanzados realmente
+* evade tooling moderna
+* usa ML real
+* hace clustering avanzado
+* tiene memoria histórica compleja
+* hace correlación multiusuario
+
+Es un:
+
+> experimental behavioral telemetry demo
+
+Y como demo funciona bastante bien conceptualmente.
+
+---
+
+# Mejoras futuras interesantes
+
+## Runtime probes
+
+* WebGL
+* AudioContext
+* Canvas
+* WASM timing
+
+## Behavioral analysis
+
+* interaction cadence
+* mouse trajectory entropy
+* event-loop pressure
+
+## Intelligence layer
+
+* adaptive scoring
+* historical baselines
+* sequence correlation
+* probabilistic modeling
+
+---
 ---
 
 # Naturaleza Experimental
