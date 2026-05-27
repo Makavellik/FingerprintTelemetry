@@ -341,7 +341,7 @@ Puede ayudarte a aprender sobre:
 
 # Filosofía del Proyecto
 
-HybridSignals no intenta verse como un dashboard tradicional.
+FingerprintTelemetry no intenta verse como un dashboard tradicional.
 
 Su diseño intenta sentirse:
 
